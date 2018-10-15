@@ -1,6 +1,7 @@
 package im.adamant.android_test_app.core;
 
 import im.adamant.android_test_app.core.entities.UnnormalizedTransactionMessage;
+import im.adamant.android_test_app.core.entities.transaction_assets.NotUsedAsset;
 import im.adamant.android_test_app.core.entities.transaction_assets.TransactionChatAsset;
 import im.adamant.android_test_app.core.entities.transaction_assets.TransactionStateAsset;
 import im.adamant.android_test_app.core.requests.NewAccount;
@@ -63,5 +64,13 @@ public interface AdamantApi {
             @Query("key") String key,
             @Query("orderBy") String order,
             @Query("limit") int limit
+    );
+
+    @GET("transactions")
+    Flowable<TransactionList<NotUsedAsset>> getAdamantTransactions(
+            @Query("inId") String address,
+            @Query("and:type") int type,
+            @Query("and:fromHeight") int height,
+            @Query("orderBy") String order
     );
 }

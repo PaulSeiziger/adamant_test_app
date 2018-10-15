@@ -12,6 +12,7 @@ import im.adamant.android_test_app.core.entities.Account;
 import im.adamant.android_test_app.core.entities.ServerNode;
 import im.adamant.android_test_app.core.entities.Transaction;
 import im.adamant.android_test_app.core.entities.UnnormalizedTransactionMessage;
+import im.adamant.android_test_app.core.entities.transaction_assets.NotUsedAsset;
 import im.adamant.android_test_app.core.entities.transaction_assets.TransactionChatAsset;
 import im.adamant.android_test_app.core.entities.transaction_assets.TransactionStateAsset;
 import im.adamant.android_test_app.core.exceptions.NotAuthorizedException;
@@ -185,6 +186,15 @@ public class AdamantApiWrapper {
             int limit
     ) {
         return api.getFromKeyValueStorage(senderId, key, order, limit)
+                .subscribeOn(Schedulers.io())
+                .doOnError(this::checkNodeError)
+                .doOnNext(operationComplete -> calcDeltas(operationComplete.getNodeTimestamp()))
+                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+    }
+
+    public Flowable<TransactionList<NotUsedAsset>> getAdamantTransactions(int type, String order) {
+        if (!isAuthorized()){return Flowable.error(new NotAuthorizedException("Not authorized"));}
+        return api.getAdamantTransactions(account.getAddress(), type, 1, order)
                 .subscribeOn(Schedulers.io())
                 .doOnError(this::checkNodeError)
                 .doOnNext(operationComplete -> calcDeltas(operationComplete.getNodeTimestamp()))

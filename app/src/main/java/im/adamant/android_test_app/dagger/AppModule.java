@@ -8,6 +8,8 @@ import com.goterl.lazycode.lazysodium.LazySodium;
 import com.goterl.lazycode.lazysodium.LazySodiumAndroid;
 import com.goterl.lazycode.lazysodium.SodiumAndroid;
 
+import java.util.Map;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -15,10 +17,17 @@ import dagger.Provides;
 import dagger.android.ContributesAndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
 
+import dagger.multibindings.IntoMap;
 import im.adamant.android_test_app.MainActivity;
 import im.adamant.android_test_app.core.AdamantApiWrapper;
 import im.adamant.android_test_app.core.encryption.AdamantKeyGenerator;
 import im.adamant.android_test_app.core.encryption.Encryptor;
+import im.adamant.android_test_app.currencies.AdamantCurrencyInfoDriver;
+import im.adamant.android_test_app.currencies.BinanceCoinInfoDriver;
+import im.adamant.android_test_app.currencies.CurrencyInfoDriver;
+import im.adamant.android_test_app.currencies.EthereumCurrencyInfoDriver;
+import im.adamant.android_test_app.currencies.SupportedCurrencyType;
+import im.adamant.android_test_app.currencies.SupportedCurrencyTypeKey;
 import im.adamant.android_test_app.helpers.NaivePublicKeyStorageImpl;
 import im.adamant.android_test_app.helpers.PublicKeyStorage;
 import im.adamant.android_test_app.helpers.Settings;
@@ -103,9 +112,36 @@ public abstract class AppModule {
     @Singleton
     @Provides
     public static AccountInteractor provideAccountInteractor(
+            AdamantApiWrapper api,
+            Map<SupportedCurrencyType, CurrencyInfoDriver> infoDrivers
+    ) {
+        return new AccountInteractor(api, infoDrivers);
+    }
+
+    @IntoMap
+    @SupportedCurrencyTypeKey(SupportedCurrencyType.ADM)
+    @Singleton
+    @Provides
+    public static CurrencyInfoDriver provideAdamantInfoDriver(
             AdamantApiWrapper api
     ) {
-        return new AccountInteractor(api);
+        return new AdamantCurrencyInfoDriver(api);
+    }
+
+    @IntoMap
+    @SupportedCurrencyTypeKey(SupportedCurrencyType.ETH)
+    @Singleton
+    @Provides
+    public static CurrencyInfoDriver provideEthereumInfoDriver() {
+        return new EthereumCurrencyInfoDriver();
+    }
+
+    @IntoMap
+    @SupportedCurrencyTypeKey(SupportedCurrencyType.BNB)
+    @Singleton
+    @Provides
+    public static CurrencyInfoDriver provideBinanceInfoDriver() {
+        return new BinanceCoinInfoDriver();
     }
 
 

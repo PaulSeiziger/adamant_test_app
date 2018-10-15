@@ -14,6 +14,7 @@ import im.adamant.android_test_app.helpers.LoggerHelper;
 import im.adamant.android_test_app.interactors.AccountInteractor;
 import im.adamant.android_test_app.interactors.AuthorizeInteractor;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 
 public class MainActivity extends Activity {
@@ -39,7 +40,7 @@ public class MainActivity extends Activity {
                 .authorize("crisp verify apart brief same private jeans parent surge bamboo lawn satisfy")
                 .flatMap(authorization -> {
                     if (authorization.isSuccess()) {
-                        return accountInteractor.getAdamantBalance();
+                        return accountInteractor.getCurrencyItemCards();
                     } else {
                         return Flowable.error(
                                 new NotAuthorizedException(
@@ -48,15 +49,23 @@ public class MainActivity extends Activity {
                         );
                     }
                 })
-                .subscribe(
-                        balance -> {
-                            String balanceText = balance + " " + getString(R.string.adm_abbr);
-                            balanceView.setText(balanceText);
-                        },
-                        error -> {
-                            LoggerHelper.e("ERR", error.getMessage(), error);
-                        }
-                );
+                .flatMapIterable(currencyCardItems -> currencyCardItems)
+                .doOnNext(currencyCardItem -> {
+                    LoggerHelper.d("CurrencyCard", currencyCardItem.getAbbreviation());
+                    LoggerHelper.d("CurrencyCard", currencyCardItem.getBalance().toString());
+                })
+                .flatMap(currencyCardItem ->
+                        accountInteractor.getLastTransfersByCurrencyAbbr(
+                                currencyCardItem.getAbbreviation()
+                        ).toFlowable()
+                )
+                .flatMapIterable(transfers -> transfers)
+                .doOnNext(transfer -> {
+                    LoggerHelper.d("Transfer", transfer.getCurrencyAbbreviation());
+                    LoggerHelper.d("Transfer", transfer.getAmount().toString());
+                })
+
+                .subscribe();
 
     }
 }

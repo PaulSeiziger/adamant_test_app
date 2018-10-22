@@ -1,4 +1,21 @@
 <resources>
     <string name="app_name">android_test_app</string>
     <string name="adm_abbr">ADM</string>
+    
+    <!-- Login -->
+    <string name="title_activity_login">Login</string>
+    
+    <!-- Balance -->
+    <string name="title_activity_balance">Balance</string>
+    <string name="balance_activity_toolbar_title">Adamant</string>
+    <string name="balance_activity_toolbar_menu">Logout</string>
+
+    <string name="balance_fragment_card_title">Adamant wallet</string>
+    <string name="balance_fragment_card_balance_title">Баланс</string>
+    <string name="balance_fragment_card_number_title">Номер</string>
+    <string name="balance_fragment_card_create_qr_title">Создать qr-код</string>
+
+    <string name="balance_fragment_recent_transactions">Recent transactions:</string>
+    <string name="balance_fragment_view_all">View All</string>
+
 </resources>

@@ -31,6 +31,7 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -72,18 +73,24 @@ public class AdamantApiWrapper {
                 }))
                 .doOnError(this::checkNodeError)
                 .doOnNext(authorization -> calcDeltas(authorization.getNodeTimestamp()))
-                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+                .doOnNext((i) -> {
+                    if (errorsCount > 0) {
+                        errorsCount--;
+                    }
+                });
     }
 
-    public Completable updateBalance(){
+    public Completable updateBalance() {
         try {
             return api
                     .authorize(keyPair.getPublicKeyString().toLowerCase())
                     .subscribeOn(Schedulers.io())
                     .doOnNext((authorization -> {
-                        if (authorization.getAccount() == null){return;}
+                        if (authorization.getAccount() == null) {
+                            return;
+                        }
 
-                        if (this.account == null){
+                        if (this.account == null) {
                             this.account = authorization.getAccount();
                             return;
                         }
@@ -94,9 +101,13 @@ public class AdamantApiWrapper {
                     }))
                     .doOnError(this::checkNodeError)
                     .doOnNext(authorization -> calcDeltas(authorization.getNodeTimestamp()))
-                    .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}})
+                    .doOnNext((i) -> {
+                        if (errorsCount > 0) {
+                            errorsCount--;
+                        }
+                    })
                     .ignoreElements();
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return Completable.error(ex);
         }
 
@@ -105,26 +116,38 @@ public class AdamantApiWrapper {
 
     public Flowable<TransactionList<TransactionChatAsset>> getTransactions(int height, String order) {
 
-        if (!isAuthorized()){return Flowable.error(new NotAuthorizedException("Not authorized"));}
+        if (!isAuthorized()) {
+            return Flowable.error(new NotAuthorizedException("Not authorized"));
+        }
 
         return api
                 .getMessageTransactions(account.getAddress(), height, order)
                 .subscribeOn(Schedulers.io())
                 .doOnError(this::checkNodeError)
                 .doOnNext(transactionList -> calcDeltas(transactionList.getNodeTimestamp()))
-                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+                .doOnNext((i) -> {
+                    if (errorsCount > 0) {
+                        errorsCount--;
+                    }
+                });
     }
 
     public Flowable<TransactionList<TransactionChatAsset>> getTransactions(String order, int offset) {
 
-        if (!isAuthorized()){return Flowable.error(new NotAuthorizedException("Not authorized"));}
+        if (!isAuthorized()) {
+            return Flowable.error(new NotAuthorizedException("Not authorized"));
+        }
 
         return api
                 .getMessageTransactions(account.getAddress(), order, offset)
                 .subscribeOn(Schedulers.io())
                 .doOnError(this::checkNodeError)
                 .doOnNext(transactionList -> calcDeltas(transactionList.getNodeTimestamp()))
-                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+                .doOnNext((i) -> {
+                    if (errorsCount > 0) {
+                        errorsCount--;
+                    }
+                });
     }
 
     public Flowable<PublicKeyResponse> getPublicKey(String address) {
@@ -133,7 +156,11 @@ public class AdamantApiWrapper {
                 .subscribeOn(Schedulers.io())
                 .doOnError(this::checkNodeError)
                 .doOnNext(publicKeyResponse -> calcDeltas(publicKeyResponse.getNodeTimestamp()))
-                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+                .doOnNext((i) -> {
+                    if (errorsCount > 0) {
+                        errorsCount--;
+                    }
+                });
     }
 
     public Flowable<TransactionWasNormalized<TransactionChatAsset>> getNormalizedTransaction(UnnormalizedTransactionMessage unnormalizedTransactionMessage) {
@@ -142,7 +169,11 @@ public class AdamantApiWrapper {
                 .subscribeOn(Schedulers.io())
                 .doOnError(this::checkNodeError)
                 .doOnNext(transactionWasNormalized -> calcDeltas(transactionWasNormalized.getNodeTimestamp()))
-                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+                .doOnNext((i) -> {
+                    if (errorsCount > 0) {
+                        errorsCount--;
+                    }
+                });
     }
 
     public Flowable<TransactionWasProcessed> processTransaction(ProcessTransaction transaction) {
@@ -151,7 +182,11 @@ public class AdamantApiWrapper {
                 .subscribeOn(Schedulers.io())
                 .doOnError(this::checkNodeError)
                 .doOnNext(transactionWasProcessed -> calcDeltas(transactionWasProcessed.getNodeTimestamp()))
-                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+                .doOnNext((i) -> {
+                    if (errorsCount > 0) {
+                        errorsCount--;
+                    }
+                });
     }
 
     public Flowable<Authorization> createNewAccount(String passPhrase) {
@@ -168,7 +203,11 @@ public class AdamantApiWrapper {
                 }))
                 .doOnError(this::checkNodeError)
                 .doOnNext(authorization -> calcDeltas(authorization.getNodeTimestamp()))
-                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+                .doOnNext((i) -> {
+                    if (errorsCount > 0) {
+                        errorsCount--;
+                    }
+                });
     }
 
     public Flowable<OperationComplete> sendToKeyValueStorage(Transaction<TransactionStateAsset> transaction) {
@@ -176,7 +215,11 @@ public class AdamantApiWrapper {
                 .subscribeOn(Schedulers.io())
                 .doOnError(this::checkNodeError)
                 .doOnNext(operationComplete -> calcDeltas(operationComplete.getNodeTimestamp()))
-                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+                .doOnNext((i) -> {
+                    if (errorsCount > 0) {
+                        errorsCount--;
+                    }
+                });
     }
 
     public Flowable<TransactionList<TransactionStateAsset>> getFromKeyValueStorage(
@@ -189,16 +232,26 @@ public class AdamantApiWrapper {
                 .subscribeOn(Schedulers.io())
                 .doOnError(this::checkNodeError)
                 .doOnNext(operationComplete -> calcDeltas(operationComplete.getNodeTimestamp()))
-                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+                .doOnNext((i) -> {
+                    if (errorsCount > 0) {
+                        errorsCount--;
+                    }
+                });
     }
 
     public Flowable<TransactionList<NotUsedAsset>> getAdamantTransactions(int type, String order) {
-        if (!isAuthorized()){return Flowable.error(new NotAuthorizedException("Not authorized"));}
+        if (!isAuthorized()) {
+            return Flowable.error(new NotAuthorizedException("Not authorized"));
+        }
         return api.getAdamantTransactions(account.getAddress(), type, 1, order)
                 .subscribeOn(Schedulers.io())
                 .doOnError(this::checkNodeError)
                 .doOnNext(operationComplete -> calcDeltas(operationComplete.getNodeTimestamp()))
-                .doOnNext((i) -> {if(errorsCount > 0) {errorsCount--;}});
+                .doOnNext((i) -> {
+                    if (errorsCount > 0) {
+                        errorsCount--;
+                    }
+                });
     }
 
     public boolean isAuthorized() {
@@ -221,29 +274,34 @@ public class AdamantApiWrapper {
 
     private void buildApi() {
 
-        if (wrapperBuildSubscription != null){
+        if (wrapperBuildSubscription != null) {
             wrapperBuildSubscription.dispose();
         }
 
         wrapperBuildSubscription = Observable.fromCallable(() -> {
-                    OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+            OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
-                    if (currentServerNode != null){
-                        currentServerNode.setStatus(ServerNode.Status.CONNECTING);
-                    }
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-                    currentServerNode = serverSelect();
-                    currentServerNode.setStatus(ServerNode.Status.CONNECTED);
+            httpClient.addInterceptor(interceptor);
 
-                    Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(currentServerNode.getUrl() + BuildConfig.API_BASE)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                        .client(httpClient.build())
-                        .build();
+            if (currentServerNode != null) {
+                currentServerNode.setStatus(ServerNode.Status.CONNECTING);
+            }
 
-                    return  retrofit.create(AdamantApi.class);
-                })
+            currentServerNode = serverSelect();
+            currentServerNode.setStatus(ServerNode.Status.CONNECTED);
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(currentServerNode.getUrl() + BuildConfig.API_BASE)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .client(httpClient.build())
+                    .build();
+
+            return retrofit.create(AdamantApi.class);
+        })
                 .doOnNext(buildedApi -> api = buildedApi)
                 .doOnError(Throwable::printStackTrace)
                 .retry(1000)
@@ -252,17 +310,19 @@ public class AdamantApiWrapper {
     }
 
     private ServerNode serverSelect() {
-        int index =  (int) Math.round(Math.floor(Math.random() * nodes.size()));
-        if (index >= nodes.size()){index = nodes.size() - 1;}
+        int index = (int) Math.round(Math.floor(Math.random() * nodes.size()));
+        if (index >= nodes.size()) {
+            index = nodes.size() - 1;
+        }
 
         return nodes.get(index);
     }
 
-    private void checkNodeError(Throwable e){
-        if ((e instanceof IOException) || (e instanceof HttpException)){
+    private void checkNodeError(Throwable e) {
+        if ((e instanceof IOException) || (e instanceof HttpException)) {
             errorsCount++;
 
-            if (errorsCount > BuildConfig.MAX_ERRORS_FOR_CHANGE_NODE){
+            if (errorsCount > BuildConfig.MAX_ERRORS_FOR_CHANGE_NODE) {
                 errorsCount = 0;
                 buildApi();
             }

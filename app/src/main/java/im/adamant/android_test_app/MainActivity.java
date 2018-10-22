@@ -1,7 +1,9 @@
 package im.adamant.android_test_app;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,6 +15,7 @@ import im.adamant.android_test_app.helpers.BalanceConvertHelper;
 import im.adamant.android_test_app.helpers.LoggerHelper;
 import im.adamant.android_test_app.interactors.AccountInteractor;
 import im.adamant.android_test_app.interactors.AuthorizeInteractor;
+import im.adamant.android_test_app.login.LoginActivity;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -36,6 +39,7 @@ public class MainActivity extends Activity {
 
         balanceView = findViewById(R.id.balance);
 
+        //нет отписки, нет обработки ошибки например отстутствия интернета, приложение должно упасть в таком случае
         Disposable disposable = authorizeInteractor
                 .authorize("crisp verify apart brief same private jeans parent surge bamboo lawn satisfy")
                 .flatMap(authorization -> {
@@ -66,6 +70,13 @@ public class MainActivity extends Activity {
                 })
 
                 .subscribe();
+
+        findViewById(R.id.btnTest).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            }
+        });
 
     }
 }

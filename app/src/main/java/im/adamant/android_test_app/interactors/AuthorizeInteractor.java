@@ -12,6 +12,7 @@ import io.github.novacrypto.bip39.Validation.WordNotFoundException;
 import io.github.novacrypto.bip39.wordlists.English;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class AuthorizeInteractor {

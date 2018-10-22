@@ -19,6 +19,11 @@ import dagger.android.support.AndroidSupportInjectionModule;
 
 import dagger.multibindings.IntoMap;
 import im.adamant.android_test_app.MainActivity;
+import im.adamant.android_test_app.balance.BalanceActivity;
+import im.adamant.android_test_app.balance.adapter.CurrencyTypeFragment;
+import im.adamant.android_test_app.balance.mvp.BalanceModel;
+import im.adamant.android_test_app.balance.mvp.BalancePresenter;
+import im.adamant.android_test_app.balance.mvp.IBalancePresenter;
 import im.adamant.android_test_app.core.AdamantApiWrapper;
 import im.adamant.android_test_app.core.encryption.AdamantKeyGenerator;
 import im.adamant.android_test_app.core.encryption.Encryptor;
@@ -33,6 +38,10 @@ import im.adamant.android_test_app.helpers.PublicKeyStorage;
 import im.adamant.android_test_app.helpers.Settings;
 import im.adamant.android_test_app.interactors.AccountInteractor;
 import im.adamant.android_test_app.interactors.AuthorizeInteractor;
+import im.adamant.android_test_app.login.LoginActivity;
+import im.adamant.android_test_app.login.mvp.ILoginPresenter;
+import im.adamant.android_test_app.login.mvp.LoginModel;
+import im.adamant.android_test_app.login.mvp.LoginPresenter;
 import io.github.novacrypto.bip39.MnemonicGenerator;
 import io.github.novacrypto.bip39.SeedCalculator;
 import io.github.novacrypto.bip39.wordlists.English;
@@ -45,7 +54,6 @@ public abstract class AppModule {
     public static Gson provideGson() {
         return new Gson();
     }
-
 
 
     @Singleton
@@ -63,7 +71,7 @@ public abstract class AppModule {
 
     @Singleton
     @Provides
-    public static MnemonicGenerator provideMnemonic(){
+    public static MnemonicGenerator provideMnemonic() {
         return new MnemonicGenerator(English.INSTANCE);
     }
 
@@ -148,4 +156,30 @@ public abstract class AppModule {
     @ActivityScope
     @ContributesAndroidInjector(modules = {MainActivityModule.class})
     public abstract MainActivity createMainActivityInjector();
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = {LoginActivityModule.class})
+    public abstract LoginActivity createLoginActivityInjector();
+
+    @Singleton
+    @Provides
+    public static ILoginPresenter provideILoginPresenter(AdamantApiWrapper api,
+                                                         AdamantKeyGenerator keyGenerator) {
+        return new LoginPresenter(new LoginModel(new AuthorizeInteractor(api, keyGenerator)));
+    }
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = {BalanceActivityModule.class})
+    public abstract BalanceActivity createBalanceActivityInjector();
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = {CurrencyTypeFragmentModule.class})
+    public abstract CurrencyTypeFragment createCurrencyTypeFragmentInjector();
+
+    @Singleton
+    @Provides
+    public static IBalancePresenter provideIBalancePresenter(AdamantApiWrapper api,
+                                                             Map<SupportedCurrencyType, CurrencyInfoDriver> infoDrivers) {
+        return new BalancePresenter(new BalanceModel(new AccountInteractor(api, infoDrivers)));
+    }
 }
